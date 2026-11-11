@@ -1,0 +1,862 @@
+@import "@fontsource-variable/schibsted-grotesk";
+
+/* Tailwind con @import, así el editor no marca advertencias */
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+/* Paleta Pizarra con acento azul cielo */
+:root {
+  --fondo: 18 21 25;
+  --superficie: 34 40 47;
+  --texto: 236 238 240;
+  --suave: 148 156 166;
+  --linea: 52 60 69;
+  --acento: 96 168 255;
+  --sombra: none;
+  --aire-1: 94 200 150;
+  --aire-2: 176 208 104;
+  --aire-3: 238 196 92;
+  --aire-4: 240 146 86;
+  --aire-5: 234 98 92;
+  color-scheme: dark;
+}
+
+@layer components {
+  /* Vidrio: fondo translúcido que desenfoca lo de atrás, borde y brillo sutiles */
+  .panel {
+    border-radius: 1rem;
+    border: 1px solid rgb(255 255 255 / 0.08);
+    background-color: rgb(var(--superficie) / 0.45);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    backdrop-filter: blur(20px) saturate(150%);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.06),
+      0 18px 40px -20px rgb(0 0 0 / 0.6);
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  /* Fondo sobrio mejorado: luz de foco arriba, línea de brillo, viñeta y degradé suave */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      /* línea de luz finita en el borde de arriba */
+      radial-gradient(42rem 2px at 50% 0%, rgb(var(--acento) / 0.55), transparent 70%),
+      /* foco principal: azul en el centro con un borde lila */
+      radial-gradient(56rem 26rem at 50% -8%, rgb(var(--acento) / 0.22), transparent 62%),
+      radial-gradient(80rem 34rem at 50% -14%, rgb(140 120 255 / 0.1), transparent 70%),
+      /* reflejo muy suave abajo */
+      radial-gradient(60rem 20rem at 50% 110%, rgb(var(--acento) / 0.06), transparent 70%),
+      /* viñeta: oscurece apenas los bordes */
+      radial-gradient(120% 90% at 50% 30%, transparent 55%, rgb(0 0 0 / 0.35) 100%),
+      linear-gradient(180deg, #151a21 0%, #111419 40%, #0f1216 100%);
+  }
+  /* Grano finito encima, le da textura (estilo Vercel / Linear) */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  body {
+    background-color: rgb(var(--fondo));
+    color: rgb(var(--texto));
+    font-family: "Schibsted Grotesk Variable", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Flecha normal sobre textos y elementos que no se tocan */
+    cursor: default;
+  }
+  /* Manito solo en lo que se puede tocar */
+  a[href],
+  button:not(:disabled),
+  [role="button"],
+  summary {
+    cursor: pointer;
+  }
+  /* Cursor de tipeo solo donde se escribe */
+  input,
+  textarea,
+  [contenteditable="true"] {
+    cursor: text;
+  }
+  :focus-visible {
+    outline: 2px solid rgb(var(--acento));
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+}
+
+/* Aguja de la brújula: se acomoda a la dirección real con un leve rebote */
+.aguja {
+  transition: transform 1400ms cubic-bezier(0.34, 1.4, 0.5, 1);
+  will-change: transform;
+}
+
+/* Vaivén mínimo: la intensidad depende del viento (variable --vaiven) */
+@keyframes vaiven {
+  0%,
+  100% {
+    transform: rotate(calc(var(--vaiven) * -1));
+  }
+  50% {
+    transform: rotate(var(--vaiven));
+  }
+}
+.vaiven {
+  animation: vaiven 3.2s ease-in-out infinite;
+  animation-delay: 1.4s;
+}
+
+/* Entrada única de la página */
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.aparecer {
+  animation: aparecer 500ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* Brújula de la pantalla de permiso: la aguja busca el norte */
+@keyframes buscar {
+  0%,
+  100% {
+    transform: rotate(-24deg);
+  }
+  50% {
+    transform: rotate(18deg);
+  }
+}
+.aguja-espera {
+  transform-origin: 60px 60px;
+  animation: buscar 2.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+/* Viento: los trazos corren por cada línea como en el ícono original */
+@keyframes viento-1 {
+  from {
+    stroke-dashoffset: -57;
+  }
+  to {
+    stroke-dashoffset: 57;
+  }
+}
+@keyframes viento-2 {
+  from {
+    stroke-dashoffset: -39;
+  }
+  to {
+    stroke-dashoffset: 39;
+  }
+}
+.viento-1 {
+  stroke-dasharray: 35 22;
+  animation: viento-1 4.5s linear infinite;
+}
+.viento-2 {
+  stroke-dasharray: 24 15;
+  animation: viento-2 4.5s linear infinite;
+  animation-delay: -3.4s;
+}
+
+/* Temperatura: el mercurio sube y baja */
+@keyframes mercurio {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+.mercurio {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: mercurio 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+/* Hoja: se mece desde el tallo, con la nervadura que se dibuja y se borra */
+@keyframes hoja {
+  0%,
+  100% {
+    transform: rotate(-7deg);
+  }
+  50% {
+    transform: rotate(7deg);
+  }
+}
+.hoja {
+  transform-origin: 2px 21px;
+  animation: hoja 2.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes nervadura {
+  0%,
+  100% {
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dashoffset: 9;
+  }
+}
+.nervadura {
+  stroke-dasharray: 16;
+  animation: nervadura 2.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+/* Globo de privacidad: aparece desde el botón */
+.globo {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px) scale(0.97);
+  transform-origin: top right;
+  transition:
+    opacity 160ms ease-out,
+    transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.globo-abierto {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}
+
+/* Buscador: desplegable de resultados */
+.desplegable {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    opacity 140ms ease-out,
+    transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    visibility 0s linear 180ms;
+}
+.desplegable-abierto {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 140ms ease-out,
+    transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.tecla {
+  border-radius: 0.25rem;
+  border: 1px solid rgb(var(--linea));
+  background-color: rgb(var(--fondo));
+  padding: 0.125rem 0.375rem;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* ---- Íconos del clima animados ---- */
+.wx-rayos {
+  transform-origin: 12px 12px;
+  animation: wx-girar 18s linear infinite;
+}
+@keyframes wx-girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.wx-nucleo {
+  transform-origin: 12px 12px;
+  animation: wx-respirar 3s ease-in-out infinite;
+}
+@keyframes wx-respirar {
+  50% {
+    transform: scale(1.1);
+  }
+}
+.wx-luna {
+  transform-origin: 12px 12px;
+  animation: wx-mecer 5s ease-in-out infinite;
+}
+.wx-luna-chica {
+  transform-origin: 16px 10px;
+  animation: wx-mecer 5s ease-in-out infinite;
+}
+@keyframes wx-mecer {
+  0%,
+  100% {
+    transform: rotate(-7deg);
+  }
+  50% {
+    transform: rotate(7deg);
+  }
+}
+.wx-estrella {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: wx-titilar 2.4s ease-in-out infinite;
+}
+.wx-estrella-2 {
+  animation-delay: -1.2s;
+}
+@keyframes wx-titilar {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.6);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.wx-nube {
+  animation: wx-flotar 4s ease-in-out infinite;
+}
+@keyframes wx-flotar {
+  0%,
+  100% {
+    transform: translateX(-1px);
+  }
+  50% {
+    transform: translateX(1.2px);
+  }
+}
+.wx-rayo {
+  animation: wx-brillo 2.4s ease-in-out infinite;
+}
+.wx-rayo-2 {
+  animation-delay: 0.3s;
+}
+.wx-rayo-3 {
+  animation-delay: 0.6s;
+}
+.wx-rayo-4 {
+  animation-delay: -0.3s;
+}
+@keyframes wx-brillo {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+.wx-gota {
+  animation: wx-caer 1.1s cubic-bezier(0.5, 0, 1, 1) infinite;
+}
+.wx-gota-2 {
+  animation-delay: -0.35s;
+}
+.wx-gota-3 {
+  animation-delay: -0.7s;
+}
+.wx-gota-4 {
+  animation-delay: -0.55s;
+}
+.wx-gota-5 {
+  animation-delay: -0.15s;
+}
+@keyframes wx-caer {
+  0% {
+    transform: translateY(-2px);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(3px);
+    opacity: 0;
+  }
+}
+.wx-copo {
+  animation: wx-nevar 2.6s ease-in-out infinite;
+}
+.wx-copo-2 {
+  animation-delay: -0.9s;
+}
+.wx-copo-3 {
+  animation-delay: -1.7s;
+}
+.wx-copo-4 {
+  animation-delay: -0.4s;
+}
+.wx-copo-5 {
+  animation-delay: -2.1s;
+}
+@keyframes wx-nevar {
+  0% {
+    transform: translate(0, -2px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  60% {
+    transform: translate(1px, 1px);
+  }
+  100% {
+    transform: translate(-0.5px, 3px);
+    opacity: 0;
+  }
+}
+.wx-relampago {
+  animation: wx-destello 3.2s linear infinite;
+}
+@keyframes wx-destello {
+  0%,
+  60%,
+  100% {
+    opacity: 0.25;
+  }
+  62%,
+  68% {
+    opacity: 1;
+  }
+  65% {
+    opacity: 0.4;
+  }
+}
+.wx-bruma {
+  animation: wx-deslizar 3.4s ease-in-out infinite;
+}
+.wx-bruma-2 {
+  animation-direction: reverse;
+}
+@keyframes wx-deslizar {
+  0%,
+  100% {
+    transform: translateX(-1.5px);
+  }
+  50% {
+    transform: translateX(1.5px);
+  }
+}
+
+/* ---- Íconos de calidad del aire (movimiento bien visible) ---- */
+@keyframes ax-flotar {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(0.8);
+    opacity: 0.35;
+  }
+  25% {
+    transform: translate(2px, -2.5px) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-1px, -4px) scale(1.1);
+    opacity: 0.8;
+  }
+  75% {
+    transform: translate(-2.5px, -1.5px) scale(0.95);
+    opacity: 1;
+  }
+}
+.ax-particula {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ax-flotar 2.6s ease-in-out infinite;
+}
+.ax-particula-lenta {
+  animation-duration: 3.6s;
+}
+@keyframes ax-pulso-sol {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(0.85);
+    opacity: 0.6;
+  }
+  50% {
+    transform: rotate(45deg) scale(1.15);
+    opacity: 1;
+  }
+}
+.ax-rayos {
+  transform-origin: 12px 12px;
+  animation: ax-pulso-sol 2.4s ease-in-out infinite;
+}
+@keyframes ax-motor {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-1.2px) rotate(-1.5deg);
+  }
+  50% {
+    transform: translateY(0) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-0.8px) rotate(1deg);
+  }
+}
+.ax-motor {
+  transform-origin: 12px 20px;
+  animation: ax-motor 0.6s ease-in-out infinite;
+}
+@keyframes ax-escape {
+  0% {
+    transform: translate(-2px, 0) scale(0.5);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(5px, -4px) scale(2);
+    opacity: 0;
+  }
+}
+.ax-escape {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ax-escape 1.4s ease-out infinite;
+}
+.ax-escape-2 {
+  animation-delay: -0.7s;
+}
+@keyframes ax-humo {
+  0% {
+    transform: translate(0, 2px) scale(0.5);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(5px, -8px) scale(2);
+    opacity: 0;
+  }
+}
+.ax-humo {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ax-humo 2.4s ease-out infinite;
+}
+.ax-humo-2 {
+  animation-delay: -0.8s;
+}
+.ax-humo-3 {
+  animation-delay: -1.6s;
+}
+/* Fogata: la llama queda quieta y suben cenizas que se apagan */
+@keyframes ax-ceniza {
+  0% {
+    transform: translate(0, 2px) scale(0.6);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  55% {
+    transform: translate(2px, -5px) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-1px, -12px) scale(0.7);
+    opacity: 0;
+  }
+}
+.ax-ceniza {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ax-ceniza 2.4s ease-out infinite;
+}
+.ax-ceniza-2 {
+  animation-delay: -0.5s;
+  animation-duration: 2.1s;
+}
+.ax-ceniza-3 {
+  animation-delay: -1s;
+  animation-duration: 2.7s;
+}
+.ax-ceniza-4 {
+  animation-delay: -1.5s;
+  animation-duration: 2.2s;
+}
+.ax-ceniza-5 {
+  animation-delay: -1.9s;
+  animation-duration: 2.5s;
+}
+@keyframes ax-hoja {
+  0%,
+  100% {
+    transform: rotate(-14deg);
+  }
+  50% {
+    transform: rotate(12deg);
+  }
+}
+.ax-hoja {
+  transform-origin: 2px 21px;
+  animation: ax-hoja 2.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes ax-latido {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(3.2);
+    opacity: 0;
+  }
+}
+.ax-latido {
+  animation: ax-latido 1.8s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+
+/* Datos de abajo: barras que crecen, punto que se ubica, segmentos y flecha que gira */
+.dato-barra {
+  transition: width 1100ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dato-punto {
+  transition:
+    left 1100ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 300ms ease-out;
+}
+.dato-segmento {
+  transition: background-color 260ms ease-out;
+}
+@keyframes dato-flecha {
+  from {
+    transform: rotate(calc(var(--giro) - 160deg));
+  }
+  to {
+    transform: rotate(var(--giro));
+  }
+}
+.dato-flecha {
+  transform: rotate(var(--giro));
+  animation: dato-flecha 1300ms cubic-bezier(0.34, 1.4, 0.5, 1) both 400ms;
+}
+
+/* Próximas horas: la curva se dibuja y los puntos aparecen */
+@keyframes curva-dibujar {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.curva-linea {
+  stroke-dasharray: 1;
+  animation: curva-dibujar 1400ms cubic-bezier(0.65, 0, 0.35, 1) both 250ms;
+}
+@keyframes curva-aparecer {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.curva-relleno {
+  animation: curva-aparecer 900ms ease-out both 900ms;
+}
+@keyframes curva-punto {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.curva-punto {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: curva-punto 400ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Próximos días: cada rango crece desde su mínima */
+@keyframes dia-rango {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.dia-rango {
+  transform-origin: left center;
+  animation: dia-rango 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* Sol: el arco se llena y el sol sube hasta su posición */
+@keyframes sol-recorte {
+  from {
+    width: 0;
+  }
+  to {
+    width: var(--ancho);
+  }
+}
+.sol-recorte {
+  width: var(--ancho);
+  animation: sol-recorte 1600ms cubic-bezier(0.45, 0, 0.2, 1) both 300ms;
+}
+@keyframes sol-subir {
+  from {
+    opacity: 0;
+    transform: rotate(var(--giro));
+  }
+  15% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg);
+  }
+}
+/* Gira alrededor del centro del arco, así sube siguiendo la curva */
+.sol-astro {
+  transform-box: view-box;
+  transform-origin: 100px 96px;
+  animation: sol-subir 1600ms cubic-bezier(0.45, 0, 0.2, 1) both 300ms;
+}
+@keyframes sol-halo {
+  50% {
+    transform: scale(1.35);
+  }
+}
+.sol-halo {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: sol-halo 3s ease-in-out infinite 2s;
+}
+
+/* Aparecer al bajar: la sección sube y se ve; hasta entonces sus animaciones esperan */
+.revelar {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 700ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 800ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.revelar.revelado {
+  opacity: 1;
+  transform: none;
+}
+.revelar:not(.revelado) * {
+  animation-play-state: paused !important;
+}
+
+/* Selector °C / °F: la marca se desliza */
+.unidad-marca {
+  transition: transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Estrella de favoritas: rebota al marcarla */
+@keyframes estrella-on {
+  0% {
+    transform: scale(0.6);
+  }
+  60% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.estrella-on {
+  animation: estrella-on 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Aviso de lluvia: baja suave y el ícono se mece */
+@keyframes aviso-bajar {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.aviso-lluvia {
+  animation: aviso-bajar 500ms cubic-bezier(0.2, 0.8, 0.2, 1) both 200ms;
+}
+@keyframes aviso-icono {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(1.5px);
+  }
+}
+.aviso-icono {
+  animation: aviso-icono 1.6s ease-in-out infinite;
+}
+
+/* Esqueleto de carga */
+@keyframes pulso {
+  50% {
+    opacity: 0.55;
+  }
+}
+.esqueleto {
+  border-radius: 0.375rem;
+  background-color: rgb(var(--linea) / 0.6);
+  animation: pulso 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aguja,
+  .vaiven,
+  .aparecer,
+  .aguja-espera,
+  .viento-1,
+  .viento-2,
+  .mercurio,
+  .hoja,
+  .nervadura,
+  .globo,
+  .desplegable,
+  .esqueleto,
+  .dato-barra,
+  .dato-punto,
+  .dato-segmento,
+  .dato-flecha,
+  .curva-linea,
+  .curva-relleno,
+  .curva-punto,
+  .dia-rango,
+  .sol-recorte,
+  .sol-astro,
+  .sol-halo,
+  .unidad-marca,
+  .estrella-on,
+  .aviso-lluvia,
+  .aviso-icono,
+  [class*="wx-"],
+  [class*="ax-"] {
+    animation: none !important;
+    transition: none !important;
+  }
+  .revelar {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .viento-1,
+  .viento-2 {
+    stroke-dasharray: none;
+  }
+}
