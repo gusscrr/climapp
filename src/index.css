@@ -78,6 +78,8 @@
     -moz-osx-font-smoothing: grayscale;
     /* Flecha normal sobre textos y elementos que no se tocan */
     cursor: default;
+    /* Sin rayita de escritura al hacer clic en la interfaz */
+    caret-color: transparent;
   }
   /* Manito solo en lo que se puede tocar */
   a[href],
@@ -91,6 +93,7 @@
   textarea,
   [contenteditable="true"] {
     cursor: text;
+    caret-color: auto;
   }
   :focus-visible {
     outline: 2px solid rgb(var(--acento));
